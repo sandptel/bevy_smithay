@@ -33,7 +33,7 @@ impl Default for ScreenshotManager {
 pub struct ScreenshotEvent {
     pub capture_type: CaptureType,
     pub mouse_overlay: MouseOverlay,
-    pub output_path: Option<PathBuf>,
+    pub output_path: PathBuf,
 }
 
 #[derive(Clone, Debug)]
@@ -58,7 +58,7 @@ impl Default for ScreenshotEvent {
         Self {
             capture_type: CaptureType::FullScreen,
             mouse_overlay: MouseOverlay::Include,
-            output_path: None,
+            output_path: get_screenshot_path(),
         }
     }
 }
@@ -72,7 +72,7 @@ impl ScreenshotEvent {
         Self {
             capture_type: CaptureType::Region { x, y, width, height },
             mouse_overlay: MouseOverlay::Include,
-            output_path: None,
+            output_path: get_screenshot_path(),
         }
     }
 
@@ -82,7 +82,7 @@ impl ScreenshotEvent {
     }
 
     pub fn with_output_path(mut self, path: PathBuf) -> Self {
-        self.output_path = Some(path);
+        self.output_path = path;
         self
     }
 }
@@ -326,7 +326,7 @@ pub fn trigger_screenshot(screenshot_manager: &ScreenshotManager, event: Screens
 }
 
 fn write_frame_to_file(frame: ScreencopyFrameOutput, event: &ScreenshotEvent) {
-    let file_name = event.output_path.clone().unwrap_or_else(|| get_screenshot_path());
+    let file_name = event.output_path.clone();
 
     // Ensure the parent directory exists
     if let Some(parent) = file_name.parent() {
